@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "next": "16.0.0",
-    "pdfkit": "^0.17.2",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
