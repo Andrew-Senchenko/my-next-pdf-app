@@ -1,19 +1,18 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).end();
+  // CORS-заголовки (ОБЯЗАТЕЛЬНО для сторонних сайтов)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
     return;
   }
 
-  let body = req.body;
-  if (typeof body === 'string') {
-    body = JSON.parse(body);
-  }
-
-  const { tracks } = body;
-  if (!Array.isArray(tracks)) {
-    res.status(400).json({ error: 'Tracks must be an array' });
+  if (req.method !== 'POST') {
+    res.status(405).end();
     return;
   }
 
