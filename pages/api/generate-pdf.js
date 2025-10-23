@@ -17,7 +17,6 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Сохраняем PDF в массив Buffer
   const doc = new PDFDocument();
   const chunks = [];
   doc.on('data', chunk => chunks.push(chunk));
@@ -35,4 +34,3 @@ export default async function handler(req, res) {
 
   doc.end();
 }
-
