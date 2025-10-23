@@ -18,33 +18,15 @@ export default async function handler(req, res) {
   }
 
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // A4 size
-
-  // Set up fonts
+  const page = pdfDoc.addPage([595, 842]);
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   let y = 800;
 
-  // Title
-  page.drawText('Favorite Tracks', {
-    x: 50,
-    y,
-    size: 24,
-    font,
-    color: rgb(0, 0, 0)
-  });
-
+  page.drawText('Favorite Tracks', { x: 50, y, size: 24, font, color: rgb(0, 0, 0) });
   y -= 40;
 
-  // Track list
   tracks.forEach(({ title, artist }, i) => {
-    const text = `${i + 1}. ${title} – ${artist}`;
-    page.drawText(text, {
-      x: 50,
-      y,
-      size: 16,
-      font,
-      color: rgb(0, 0, 0)
-    });
+    page.drawText(`${i + 1}. ${title} – ${artist}`, { x: 50, y, size: 16, font, color: rgb(0, 0, 0) });
     y -= 24;
   });
 
