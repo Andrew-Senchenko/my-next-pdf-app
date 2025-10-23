@@ -1,4 +1,4 @@
-import PDFDocument from 'pdfkit';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -17,20 +17,41 @@ export default async function handler(req, res) {
     return;
   }
 
-  const doc = new PDFDocument();
-  const chunks = [];
-  doc.on('data', chunk => chunks.push(chunk));
-  doc.on('end', () => {
-    const pdfBuffer = Buffer.concat(chunks);
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="favorites.pdf"');
-    res.status(200).end(pdfBuffer);
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([595, 842]); // A4 size
+
+  // Set up fonts
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  let y = 800;
+
+  // Title
+  page.drawText('Favorite Tracks', {
+    x: 50,
+    y,
+    size: 24,
+    font,
+    color: rgb(0, 0, 0)
   });
 
-  doc.fontSize(20).text('Favorite Tracks', { align: 'center' }).moveDown();
+  y -= 40;
+
+  // Track list
   tracks.forEach(({ title, artist }, i) => {
-    doc.fontSize(14).text(`${i + 1}. ${title} – ${artist}`);
+    const text = `${i + 1}. ${title} – ${artist}`;
+    page.drawText(text, {
+      x: 50,
+      y,
+      size: 16,
+      font,
+      color: rgb(0, 0, 0)
+    });
+    y -= 24;
   });
 
-  doc.end();
+  const pdfBytes = await pdfDoc.save();
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename="favorites.pdf"');
+  res.status(200).send(Buffer.from(pdfBytes));
 }
+
