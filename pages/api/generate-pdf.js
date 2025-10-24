@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from 'fontkit';
 
@@ -7,7 +5,6 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -38,19 +35,14 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Лог для отладки
-  console.log('!!! fontkit', fontkit);
-
-  const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Inter-V.ttf');
-  const fontBytes = fs.readFileSync(fontPath);
+  // Используем fetch даже на сервере!
+  const fontRes = await fetch('https://' + req.headers.host + '/fonts/Inter-V.ttf');
+  const fontBytes = await fontRes.arrayBuffer(); // результат — ArrayBuffer
 
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
-  console.log('!!! Registered fontkit');
-
   const page = pdfDoc.addPage([595, 842]);
-  const font = await pdfDoc.embedFont(fontBytes);
-  console.log('!!! Embedded font');
+  const font = await pdfDoc.embedFont(new Uint8Array(fontBytes));
 
   let y = 800;
   page.drawText('Favorite Tracks', { x: 50, y, size: 24, font, color: rgb(0, 0, 0) });
