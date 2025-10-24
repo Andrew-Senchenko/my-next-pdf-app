@@ -37,15 +37,16 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Путь к твоему шрифту
   const fontPath = path.join(process.cwd(), 'fonts', 'Inter-V.ttf');
   const fontBytes = fs.readFileSync(fontPath);
 
   const pdfDoc = await PDFDocument.create();
-  pdfDoc.registerFontkit(fontkit); // <<<<<< ОБЯЗАТЕЛЬНО!
-  const font = await pdfDoc.embedFont(fontBytes);
+  pdfDoc.registerFontkit(fontkit);
+  const page = pdfDoc.addPage([595, 842]);        // <<< вот это строка
 
+  const font = await pdfDoc.embedFont(fontBytes);
   let y = 800;
+
   page.drawText('Favorite Tracks', { x: 50, y, size: 24, font, color: rgb(0, 0, 0) });
   y -= 40;
 
