@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,6 +20,7 @@ export default async function handler(req, res) {
     }
     tracks = Array.isArray(body.tracks) ? body.tracks : [];
   }
+
   if (req.method === 'GET') {
     if (req.query.tracks) {
       try {
@@ -35,12 +37,12 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Подключение кастомного шрифта с поддержкой кириллицы
+  // Путь к твоему шрифту
   const fontPath = path.join(process.cwd(), 'fonts', 'Inter-V.ttf');
   const fontBytes = fs.readFileSync(fontPath);
 
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]);
+  pdfDoc.registerFontkit(fontkit); // <<<<<< ОБЯЗАТЕЛЬНО!
   const font = await pdfDoc.embedFont(fontBytes);
 
   let y = 800;
