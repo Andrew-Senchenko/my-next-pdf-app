@@ -1,10 +1,11 @@
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import fs from 'fs';
+import path from 'path';
+import { PDFDocument, rgb } from 'pdf-lib';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -18,11 +19,9 @@ export default async function handler(req, res) {
     }
     tracks = Array.isArray(body.tracks) ? body.tracks : [];
   }
-
   if (req.method === 'GET') {
     if (req.query.tracks) {
       try {
-        // Декодируем строку из URL перед парсингом JSON
         const decoded = decodeURIComponent(req.query.tracks);
         tracks = JSON.parse(decoded);
       } catch (e) {
@@ -36,10 +35,14 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Подключение кастомного шрифта с поддержкой кириллицы
+  const fontPath = path.join(process.cwd(), 'fonts', 'Inter-V.ttf');
+  const fontBytes = fs.readFileSync(fontPath);
+
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  
+  const font = await pdfDoc.embedFont(fontBytes);
+
   let y = 800;
   page.drawText('Favorite Tracks', { x: 50, y, size: 24, font, color: rgb(0, 0, 0) });
   y -= 40;
@@ -55,4 +58,3 @@ export default async function handler(req, res) {
   res.setHeader('Content-Disposition', 'attachment; filename="favorites.pdf"');
   res.status(200).send(Buffer.from(pdfBytes));
 }
-
