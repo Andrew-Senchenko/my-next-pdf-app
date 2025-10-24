@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   // Лог для отладки
   console.log('!!! fontkit', fontkit);
 
-  const fontPath = path.join(process.cwd(), 'fonts', 'Inter-V.ttf');
+  const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Inter-V.ttf');
   const fontBytes = fs.readFileSync(fontPath);
 
   const pdfDoc = await PDFDocument.create();
