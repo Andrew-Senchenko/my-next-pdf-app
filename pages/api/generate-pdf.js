@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { PDFDocument, rgb } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
+import fontkit from 'fontkit';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
